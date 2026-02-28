@@ -10,24 +10,32 @@ const form = document.querySelector(".form")
 
 form.addEventListener("submit",handleSubmit)
 
-function handleSubmit(e){
+function handleSubmit(e) {
     e.preventDefault()
-    const query = form.elements["search-text"].value.trim() 
+    const query = form.elements["search-text"].value.trim()
     if (query === "") {
         return;
     }
     clearGallery()
     showLoader()
-        getImagesByQuery(query)
-            .then(data => {
-                hideLoader();
-                if (data.length === 0) {
-                    iziToast.error({
+    getImagesByQuery(query)
+        .then(data => {
+            if (data.length === 0) {
+                iziToast.error({
                     message: "Sorry, there are no images matching your search query. Please try again!",
                     position: "topRight"
-                    })
-                    return;
-                }
-                createGallery(data);
-            })
+                });
+                return;
+            }
+            createGallery(data);
+        })
+        .catch(error => {
+            iziToast.error({
+                message: "Something went wrong. Please try again!",
+                position: "topRight"
+            });
+        })
+        .finally(() => {
+            hideLoader();
+        });
 }
